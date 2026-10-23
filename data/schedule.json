@@ -1,5 +1,5 @@
 {
-  "pulled_at": "2026-10-23T17:25:28.330Z",
+  "pulled_at": "2026-10-23T18:08:30.678Z",
   "rows": [
     {
       "time": "9:00–9:15 AM",
@@ -202,12 +202,34 @@
     {
       "time": "1:45–1:50 PM",
       "what": "5 min",
-      "tbd": true
+      "speaker": "Eliran Wolff",
+      "org": "NVIDIA",
+      "title": "Where Multiplexing Pays: Scheduling Sandboxes for RL Rollouts",
+      "abstract": "Agentic RL fans each training step into many mostly-idle sandboxes. We ran NeMo Gym’s SWE-bench agent on Agent Substrate (suspend/resume multiplexing during LLM calls) and OpenSandbox (one pod per rollout).\nIn some cases we were able to lower the wall time by over 30% by suspending actors on Substrate during LLM calls. We’ll walk through how we benchmarked both platforms, and the surprises we hit along the way.",
+      "photos": [
+        {
+          "name": "Eliran Wolff",
+          "src": "assets/speakers/eliran-wolff.jpg"
+        }
+      ]
     },
     {
       "time": "1:55–2:25 PM",
       "what": "30 min",
-      "tbd": true
+      "speaker": "Omer Yahud, Eliran Wolff",
+      "org": "NVIDIA",
+      "title": "Scheduling sandboxes like threads: a policy layer for Agent Substrate",
+      "abstract": "Agent Substrate multiplexes many of actors onto a small pool of warm workers, but it does not decide who runs next.\n\nWhen a pool is full, resume calls to ateapi fail, and the router parks the request and retries, and whichever retry lands first wins the worker.\nFor reinforcement learning rollouts and coding-agent fleets, where sandboxes outnumber workers by an order of magnitude, that order decides how long a generation step takes and which rollouts make progress at all.\n\nThis talk presents an orchestration layer we are building on top of Agent Substrate's public API. It adds what an operating system scheduler gives threads: a resume queue ordered by policy, preemption of idle sandboxes to make room,\na free-worker buffer, and per-pool policies declared as a Kubernetes resource. Underneath, KAI Scheduler places the worker pods themselves, so tenants get hierarchical queues with quota, fair share and reclaim across their WorkerPools.\n\nWe will walk through the design and example use cases and configurations for effective multiplexing.",
+      "photos": [
+        {
+          "name": "Omer Yahud",
+          "src": "assets/speakers/omer-yahud.jpg"
+        },
+        {
+          "name": "Eliran Wolff",
+          "src": "assets/speakers/eliran-wolff.jpg"
+        }
+      ]
     },
     {
       "time": "2:30–2:50 PM",
