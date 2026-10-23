@@ -1,11 +1,11 @@
 :root {
   --bg: #070708;
-  --lime: #30ff63;
+  --lime: #56fd5a;
   --text: #f4f4f5;
   --muted: #a39eb2;
   --cream: #f4f1e8;
   --ink: #121212;
-  --line: rgba(48, 255, 99, 0.35);
+  --line: rgba(86, 253, 90, 0.35);
   --max: 880px;
 }
 
@@ -151,6 +151,8 @@ h1 {
   max-width: 38rem;
   font-size: 1.2rem;
 }
+
+.lede + .lede { margin-top: 0.85rem; }
 
 .facts {
   margin-top: 1rem;

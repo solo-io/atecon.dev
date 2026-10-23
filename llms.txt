@@ -1,15 +1,16 @@
 # Agent Substrate Day
 
-> One-room community gathering for engineers building infrastructure for AI agents on Kubernetes. Monday, November 9, 2026, 9:00am–5:00pm America/Denver, at Sky SLC in Salt Lake City.
+> The community gathering for engineers building infrastructure for AI agents on Kubernetes - brought to you by [Google](https://cloud.google.com/), [Solo.io](https://www.solo.io?utm_source=atecon&utm_medium=referrer&utm_campagin=agentsubstrateday) and the Agent Substrate Community. Monday, November 9, 2026, 9:00am–5:00pm America/Denver, at Sky SLC in Salt Lake City.
 
 The event page currently sends noindex, nofollow. This file is the public description prepared for when that changes. Talk slots marked TBD do not have an announced speaker.
 
-Hosted with Google, Solo.io, and the Agent Substrate community. One track, in one room.
+Hosted by the maintainers and core contributors behind Agent Substrate. One track, in one room.
 
 ## Event
 
 - [Agent Substrate Day](https://atecon.dev/): the event page
-- [Register on Luma](https://luma.com/48hh3jo5): registration for the Monday event. Tuesday night details stay on the same page
+- [Register on Luma](https://luma.com/48hh3jo5): registration for Monday, November 9
+- [Agent Substrate Community Party](https://luma.com/re1kzz80): Tuesday night after KubeCrawl + CloudNativeFest
 - Place: Sky SLC, 149 Pierpont Ave, Salt Lake City, UT 84101
 - Time: 9:00am–5:00pm America/Denver (MST, UTC−7)
 

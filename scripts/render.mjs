@@ -14,6 +14,8 @@ const rows = Array.isArray(schedule.rows) ? schedule.rows : [];
 const discoverable = false;
 const siteUrl = 'https://atecon.dev/';
 const registerUrl = 'https://luma.com/48hh3jo5';
+const googleUrl = 'https://cloud.google.com/';
+const soloUrl = 'https://www.solo.io?utm_source=atecon&utm_medium=referrer&utm_campagin=agentsubstrateday';
 
 const aliases = {
 	time: ['time', 'start', 'start time', 'slot', 'when', 'session time'],
@@ -25,6 +27,23 @@ const aliases = {
 	link: ['link', 'url', 'slides', 'recording', 'session link'],
 	photo: ['photo', 'headshot', 'image', 'avatar', 'picture', 'photo url'],
 };
+
+const orgUrls = {
+	Google: googleUrl,
+	'Solo.io': soloUrl,
+	NVIDIA: 'https://www.nvidia.com/',
+	AWS: 'https://aws.amazon.com/',
+	'Cloud Foundry Foundation': 'https://www.cloudfoundry.org/',
+};
+
+function linkedOrg(value) {
+	return String(value || '').split(',').map((part) => {
+		const name = part.trim();
+		const href = orgUrls[name];
+		if (!href) return esc(name);
+		return `<a href="${esc(href)}">${esc(name)}</a>`;
+	}).join(', ');
+}
 
 function esc(value) {
 	return String(value ?? '').replace(/[&<>"']/g, (ch) => ({
@@ -154,7 +173,7 @@ function eventSchema() {
 		'@type': 'Event',
 		'@id': `${siteUrl}#event`,
 		name: 'Agent Substrate Day',
-		description: 'The community gathering for engineers building infrastructure for AI agents on Kubernetes, from Google, Solo.io, and the Agent Substrate community.',
+		description: 'The community gathering for engineers building infrastructure for AI agents on Kubernetes - brought to you by Google, Solo.io and the Agent Substrate Community.',
 		url: siteUrl,
 		image: `${siteUrl}assets/sky-slc.jpg`,
 		startDate: '2026-11-09T09:00:00-07:00',
@@ -164,8 +183,8 @@ function eventSchema() {
 		inLanguage: 'en',
 		location: place,
 		organizer: [
-			{ '@type': 'Organization', name: 'Google', url: 'https://www.google.com/' },
-			{ '@type': 'Organization', name: 'Solo.io' },
+			{ '@type': 'Organization', name: 'Google', url: googleUrl },
+			{ '@type': 'Organization', name: 'Solo.io', url: soloUrl },
 			{ '@type': 'Organization', name: 'Agent Substrate', url: 'https://github.com/agent-substrate/substrate' },
 		],
 		offers: {
@@ -181,7 +200,7 @@ function llmsText() {
 	const lines = [
 		'# Agent Substrate Day',
 		'',
-		'> One-room community gathering for engineers building infrastructure for AI agents on Kubernetes. Monday, November 9, 2026, 9:00am–5:00pm America/Denver, at Sky SLC in Salt Lake City.',
+		`> The community gathering for engineers building infrastructure for AI agents on Kubernetes - brought to you by [Google](${googleUrl}), [Solo.io](${soloUrl}) and the Agent Substrate Community. Monday, November 9, 2026, 9:00am–5:00pm America/Denver, at Sky SLC in Salt Lake City.`,
 		'',
 	];
 	if (!discoverable) {
@@ -189,12 +208,13 @@ function llmsText() {
 		lines.push('');
 	}
 	lines.push(
-		'Hosted with Google, Solo.io, and the Agent Substrate community. One track, in one room.',
+		'Hosted by the maintainers and core contributors behind Agent Substrate. One track, in one room.',
 		'',
 		'## Event',
 		'',
 		'- [Agent Substrate Day](https://atecon.dev/): the event page',
-		'- [Register on Luma](https://luma.com/48hh3jo5): registration for the Monday event. Tuesday night details stay on the same page',
+		'- [Register on Luma](https://luma.com/48hh3jo5): registration for Monday, November 9',
+		'- [Agent Substrate Community Party](https://luma.com/re1kzz80): Tuesday night after KubeCrawl + CloudNativeFest',
 		'- Place: Sky SLC, 149 Pierpont Ave, Salt Lake City, UT 84101',
 		'- Time: 9:00am–5:00pm America/Denver (MST, UTC−7)',
 		'',
@@ -247,7 +267,7 @@ function sessionHtml(row, index) {
 	const link = safeUrl(take(row, aliases.link, used));
 	const photo = safeUrl(take(row, aliases.photo, used));
 	const what = take(row, ['what', 'format', 'kind'], used);
-	const roleLine = [role, org].filter(Boolean).join(', ');
+	const roleLine = [role ? esc(role) : '', org ? linkedOrg(org) : ''].filter(Boolean).join(', ');
 	const hidden = new Set(['kind', 'sessionize', 'confirmed', 'duration', 'photos', 'tbd', 'what']);
 	const extras = Object.entries(row).filter(([key, value]) => !used.has(key) && !hidden.has(key.trim().toLowerCase()) && (typeof value === 'string' || typeof value === 'number'));
 	const marker = /^(break|lunch|transition)$/i.test(what) || (!speaker && !talk);
@@ -270,7 +290,7 @@ function sessionHtml(row, index) {
             ${photoHtml}
             <h3>${esc(heading)}</h3>
           </div>
-          ${roleLine ? `<p class="role">${esc(roleLine)}</p>` : ''}
+          ${roleLine ? `<p class="role">${roleLine}</p>` : ''}
           ${talk && talk !== heading ? `<p class="talk">${esc(talk)}</p>` : ''}
           ${abstractHtml(abstract)}
           ${link ? `<p class="session-link"><a href="${esc(link)}">Session link</a></p>` : ''}
@@ -291,13 +311,13 @@ const html = `<!DOCTYPE html>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 ${robots}  <title>Agent Substrate Day</title>
-  <meta name="description" content="Agent Substrate Day, November 9, 2026, at Sky SLC in Salt Lake City. One room, one schedule, with the people building agent infrastructure on Kubernetes.">
+  <meta name="description" content="The community gathering for engineers building infrastructure for AI agents on Kubernetes - brought to you by Google, Solo.io and the Agent Substrate Community.">
   <script type="application/ld+json">${jsonLd}</script>
   <link rel="icon" href="assets/ate-logo-with-border.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=11">
+  <link rel="stylesheet" href="styles.css?v=12">
   <script>
     window.HIVEMIND_ATTRIBUTION = {
       propertyKey: 'pk_5dc4bcfa84b8c0fb6e3875770fa7c385',
@@ -326,23 +346,15 @@ ${robots}  <title>Agent Substrate Day</title>
   <main>
     <section class="hero">
       <div class="hero-copy">
-        <p class="kicker">Monday, November 9, 2026</p>
-        <h1>One room. One schedule.</h1>
-        <p class="lede">The community gathering for engineers building infrastructure for AI agents on Kubernetes, from Google, Solo.io, and the Agent Substrate community.</p>
+        <h1>Agent Substrate Day</h1>
+        <p class="lede">The community gathering for engineers building infrastructure for AI agents on Kubernetes - brought to you by <a href="${esc(googleUrl)}">Google</a>, <a href="${esc(soloUrl)}">Solo.io</a> and the Agent Substrate Community.</p>
+        <p class="lede">Is Sandbox enough? Is a pod the right deployment format for AI agents? Join us at Agent Substrate Day to interact with project maintainers and early adopters of Agent Substrate.</p>
+        <p class="lede">Hosted by the maintainers and core contributors behind Agent Substrate, this event is built by the community, for the community. Expect deep technical talks and direct access to Agent Substrate maintainers, contributors, and the broader community.</p>
         <p class="facts">9:00am–5:00pm <span>·</span> Sky SLC, Salt Lake City</p>
         <p class="calendar"><span class="cal-label">Add to calendar</span> <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Agent%20Substrate%20Day&amp;dates=20261109T160000Z/20261110T000000Z&amp;ctz=America/Denver&amp;location=Sky%20SLC%2C%20149%20Pierpont%20Ave%2C%20Salt%20Lake%20City%2C%20UT%2084101&amp;details=One%20room.%20One%20schedule.%20Register%3A%20https%3A%2F%2Fluma.com%2F48hh3jo5">Google</a> <a href="https://outlook.office.com/calendar/0/deeplink/compose?rru=addevent&amp;subject=Agent%20Substrate%20Day&amp;startdt=2026-11-09T16%3A00%3A00Z&amp;enddt=2026-11-10T00%3A00%3A00Z&amp;location=Sky%20SLC%2C%20149%20Pierpont%20Ave%2C%20Salt%20Lake%20City%2C%20UT%2084101&amp;body=One%20room.%20One%20schedule.%20Register%3A%20https%3A%2F%2Fluma.com%2F48hh3jo5">Outlook</a> <a href="agent-substrate-day.ics">Apple</a></p>
         <a class="register large" href="https://luma.com/48hh3jo5">Register on Luma</a>
       </div>
       <img class="yolo" src="assets/ate-logo-with-border.svg" alt="Yolo, the Agent Substrate octopus">
-    </section>
-    <section class="expect">
-      <h2>What to expect</h2>
-      <ul>
-        <li>A single track. Nothing else is happening in another room.</li>
-        <li>Talks from teams running agentic workloads on Kubernetes in production.</li>
-        <li>Time with Agent Substrate and kagent maintainers.</li>
-        <li>An update on project direction and roadmap.</li>
-      </ul>
     </section>
     <section class="schedule" id="schedule">
       <h2>Sessions</h2>
@@ -355,13 +367,13 @@ ${robots}  <title>Agent Substrate Day</title>
       <div class="place-copy">
         <h2>Sky SLC</h2>
         <p>149 Pierpont Ave<br>Salt Lake City, UT 84101</p>
-        <p class="party">Tuesday night, after KubeCrawl + CloudNativeFest, the same community keeps going. Details stay on the Luma page.</p>
-        <a href="https://luma.com/48hh3jo5">Luma page</a>
+        <p class="party">Join us on Tuesday night after KubeCrawl + CloudNativeFest to keep the party going!</p>
+        <a href="https://luma.com/re1kzz80">Register now: Agent Substrate Community Party</a>
       </div>
     </section>
   </main>
   <footer>
-    <p>Agent Substrate Day is hosted with Google, Solo.io, and the Agent Substrate community.</p>
+    <p>Agent Substrate Day is hosted with <a href="${esc(googleUrl)}">Google</a>, <a href="${esc(soloUrl)}">Solo.io</a>, and the Agent Substrate community.</p>
   </footer>
 </body>
 </html>
