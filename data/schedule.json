@@ -1,0 +1,264 @@
+{
+  "pulled_at": "2026-10-23T17:25:28.330Z",
+  "rows": [
+    {
+      "time": "9:00–9:15 AM",
+      "what": "Intro & logistics",
+      "speaker": "Tim Hockin, Eitan Yarmush, Ron Lev",
+      "org": "Google, Solo.io, NVIDIA",
+      "photos": [
+        {
+          "name": "Tim Hockin",
+          "src": "assets/speakers/tim-hockin.jpg"
+        },
+        {
+          "name": "Eitan Yarmush",
+          "src": "assets/speakers/eitan-yarmush.jpg"
+        },
+        {
+          "name": "Ron Lev",
+          "src": "assets/speakers/ron-lev.jpg"
+        }
+      ]
+    },
+    {
+      "time": "9:20–9:30 AM",
+      "what": "10 min",
+      "speaker": "Michael Levan",
+      "org": "Solo.io",
+      "title": "Agent Substrate 101: Building Isolated, Governed and Scalable AI",
+      "abstract": "Agents need to be isolated for what they can and can't access (files/folders, production envs, LLMs, MCP tools, runtimes, etc. - think autonomous and standard Agents) and at the same time, scale up and down based on load, if/how the Agent is being used, and how it's being used.\n\nBy default, Agents have access to every file, LLM, command, and authN/Z implementation that you do. At the same time, you're running Agents in a scalable, performant, and reliable way with a proven out orchestration/clustering platform.\n\nExample: You want to run 200+ Agents, but only spread across 6-8 k8s Pods. The Agents still perform as well as expected while keeping the underlying infrastructure costs (both resources and actual financial costs) low.\n\nIn this intro to Agent Substrate session, you will learn about the OSS project that makes this happen - Agent Substrate, with key topics including:\n\n1. Build on top of k8s primitives (clustering of resources for performant sandboxed Agents).\n2. Implement a specialized and efficient a Control/Management Plane that's built for the world of agentic.\n3. How Substrate Actors running Agents are 90% more efficient (proven in benchmarks) for cost optimization in comparison to Agents in k8s Pods.\n4. Efficient and much smaller footprints for running Agents via Actors.",
+      "photos": [
+        {
+          "name": "Michael Levan",
+          "src": "assets/speakers/michael-levan.jpg"
+        }
+      ]
+    },
+    {
+      "time": "9:35–9:45 AM",
+      "what": "10 min",
+      "speaker": "Jeremy Cowan",
+      "org": "Solo.io",
+      "title": "A platform engineers dilemma: agent-sandbox or agent-substrate?",
+      "abstract": "As developers clamor to build agents, platform engineers responsible for managing Kubernetes are faced with a dilemma: do they run those agents as pods? Do they sandbox them with agent-sandbox? Or do they run them with agent-substrate? In this session we'll review the differences between these options and articulate why you ought to consider agent-substrate and the advantages it brings.",
+      "photos": [
+        {
+          "name": "Jeremy Cowan",
+          "src": "assets/speakers/jeremy-cowan.jpg"
+        }
+      ]
+    },
+    {
+      "time": "9:50–10:10 AM",
+      "what": "20 min",
+      "speaker": "Carlos Santana",
+      "org": "AWS",
+      "title": "Running Agent Substrate in Production on EKS with microVMs",
+      "abstract": "Agent Substrate packs many stateful actors onto a small pool of warm worker pods, now runnable on EKS with a microVM sandbox for pods. This talk is about what it takes to run that in production on AWS: which pieces offload to managed services, actor snapshots on Amazon S3 and the control-plane database on RDS or Aurora PostgreSQL, and where the gaps still are.\n\nThose gaps are the point: no AWS credential provider for actor secrets yet (the interface ships Kubernetes Secrets and Google Secret Manager, not Secrets Manager or Parameter Store), no automated idle-suspension or worker-consolidation policy, and cloud-neutral transport and pod-identity work still worth upstreaming. The goal is an honest map of where Agent Substrate on EKS works today and where AWS and the community can push it.",
+      "photos": [
+        {
+          "name": "Carlos Santana",
+          "src": "assets/speakers/carlos-santana.jpg"
+        }
+      ]
+    },
+    {
+      "time": "10:15–10:35 AM",
+      "what": "20 min",
+      "speaker": "Mike Moore",
+      "org": "Solo.io",
+      "title": "kubectl Is Lying to You: What a Live Visualizer Taught Me About Agent Substrate",
+      "abstract": "Run `kubectl get pods` on an Agent Substrate cluster and you see a few quiet worker pods. Meanwhile untold numbers of agents are restoring from snapshots, queuing for slots, and checkpointing back to object storage. The interesting state isn't in pods. So I built Substrate Scope, an open-source live visualizer that shows the runtime as it really works: worker bays, a restore queue, the snapshot shelf, and agents moving between them in real time. Its buttons act on the real cluster: they scale the WorkerPool, run a demand-driven autoscaler, fire surge traffic, and reset a wedged pool.\n\nThe visualizer I built turned out to be the best way to find Substrate's edges and frankly, to explain how it works for those of us who need crayons to understand things (that would be me). On my laptop cluster I ran 18 agents on two worker pods and served over a thousand real sessions, with a minimum reserved capacity 4.5x lower than the same agents as always-on pods. This talk is a live demo plus an accounting and discussion of what broke along the way and how we work through it.\n\n- My tool ended up with lost running sessions because I read the actors list. Every finished session leaves a Suspended actor behind; mine passed through thousands of entries in a day and started returning partial results. The workers list is the source of truth.\n\n- CPU and memory are the wrong autoscaling signals! Workers are slot-bound and active sessions idle at single-digit mCPU. Substrate rejects when the pool is full instead of queuing, so the real demand signal is in your callers' retry loops.\n\n- My autoscaler made things worse functionally worse. On a serial model backend, more workers just piled more requests onto one generation queue. Everything piled up and timed out and it was a hot mess. We'll look at how we address this.\n\n- Killed sessions left ghost actors pinning workers while the pool looked idle. This made me sad but it's fixable.\n\n- \"Pods vs. substrate\" charts lie if you compare usage. Idle pods use almost no CPU but reserve it forever. Reservation is the number to keep an eye on.\n\nYou'll leave knowing what to watch on a Substrate cluster, what to scale on, which failures to expect under load, and a tool you can point at your own cluster today."
+    },
+    {
+      "time": "10:35–11:00 AM",
+      "what": "Break"
+    },
+    {
+      "time": "11:00–11:20 AM",
+      "what": "20 min",
+      "speaker": "Keith Mattix",
+      "org": "Solo.io",
+      "title": "Network Policy at Substrate Scale",
+      "abstract": "Congratulations, you've got substrate running on your cluster! But after the eureka moment fades, you're now tasked with figuring out how to integrate your shiny new actors into your existing security and compliance posture. Come join us for an exploration of the tools substrate provides to establish a zero trust architecture for agents and how those tools compose other cloud-native-components like service mesh and Kubernetes NetworkPolicy.",
+      "photos": [
+        {
+          "name": "Keith Mattix",
+          "src": "assets/speakers/keith-mattix.png"
+        }
+      ]
+    },
+    {
+      "time": "11:25–11:55 AM",
+      "what": "30 min",
+      "tbd": true
+    },
+    {
+      "time": "12:00–12:05 PM",
+      "what": "5 min",
+      "speaker": "Ram Iyengar",
+      "org": "Cloud Foundry Foundation",
+      "title": "Five Reasons I thought Agent Substrate Would Fail",
+      "photos": [
+        {
+          "name": "Ram Iyengar",
+          "src": "assets/speakers/ram-iyengar.jpg"
+        }
+      ]
+    },
+    {
+      "time": "12:05–12:10 PM",
+      "what": "5 min",
+      "tbd": true
+    },
+    {
+      "time": "12:10–12:15 PM",
+      "what": "5 min",
+      "tbd": true
+    },
+    {
+      "time": "12:15–12:20 PM",
+      "what": "5 min",
+      "speaker": "Bowei Du, Lior Lieberman",
+      "org": "Google",
+      "title": "Truly Sandboxed Networking: Moving beyond MVP",
+      "abstract": "In this session we will discuss the current Substrate network isolation and directions for improving isolation for Actor workloads. What we currently have in the project is closer to a minimal viable infrastructure and this breakout seeks to map out the post-V1 roadmap for the project.",
+      "photos": [
+        {
+          "name": "Bowei Du",
+          "src": "assets/speakers/bowei-du.jpg"
+        },
+        {
+          "name": "Lior Lieberman",
+          "src": "assets/speakers/lior-lieberman.jpg"
+        }
+      ]
+    },
+    {
+      "time": "12:20–12:25 PM",
+      "what": "5 min",
+      "speaker": "Mofi Rahman",
+      "org": "Google",
+      "title": "Using Substrate for anything but Agents",
+      "abstract": "Agent Substrate is for agents. It is right there in the name. Or is it? Strip away the LLM orchestration frameworks, and what you are left with is a systems engineer's dream: an ultra-high-density, multi-tenant sandboxing platform built on Kubernetes that bypasses standard Pod lifecycle constraints.\n\nWhat happens when we hijack these primitives for workloads that have absolutely nothing to do with AI? In this talk, we will explore the limits of Substrate by utilizing its core building blocks: native process-level suspend/resume, rapid rehydration, and pod-decoupled scaling.\n\nThrough this exercise of “unconventional systems-engineering design patterns” we’ll look at the good ideas, the terrible ideas, and how pushing this infrastructure to its limits helps us all gain a better understanding of why these exact primitives make Substrate the perfect foundation for the agentic era.",
+      "photos": [
+        {
+          "name": "Mofi Rahman",
+          "src": "assets/speakers/mofi-rahman.jpg"
+        }
+      ]
+    },
+    {
+      "time": "12:25–1:25 PM",
+      "what": "Lunch"
+    },
+    {
+      "time": "1:25–1:30 PM",
+      "what": "5 min",
+      "speaker": "Nick Nellis",
+      "org": "Solo.io",
+      "title": "Postcard from 2028: A Platform Team’s Retro on Agent Substrate",
+      "abstract": "It’s November 2028. A 10,000 person company has run its agent platform on Substrate for two years. There are 20 agents for every employee, most sessions are started by other agents rather than people, and some cases stay suspended for weeks. This talk is that platform team’s retro: what worked, what hurt, and what they’d tell themselves in 2026.\nEach story in the retro starts from a trend we can already see, including power users with a hundred agents, agent-to-agent fan-out, long-running case work, shared agents acting on someone’s behalf, and unattended automation. Each one is followed to where it ends up.\nThen we come back to today. Substrate is in alpha, and every one of those stories comes down to a decision that’s still cheap to change. We’ll walk through the personas, use cases, and a concrete list of asks, backed by customer design sessions and measurements from running kagent on Substrate.",
+      "photos": [
+        {
+          "name": "Nick Nellis",
+          "src": "assets/speakers/nick-nellis.jpg"
+        }
+      ]
+    },
+    {
+      "time": "1:30–1:35 PM",
+      "what": "5 min",
+      "tbd": true
+    },
+    {
+      "time": "1:35–1:40 PM",
+      "what": "5 min",
+      "speaker": "Omer Yahud",
+      "org": "NVIDIA",
+      "title": "Suspend-safe networking",
+      "abstract": "Suspending an actor today cuts every TCP connection it holds, so an agent waiting on a slow call cannot be suspended.\nThis session shows a concept design that keeps those connections alive while the actor is suspended and restored on any worker, wakes it when data arrives, and demonstrates it live with an inbound request that waits on an outbound call across a suspend.",
+      "photos": [
+        {
+          "name": "Omer Yahud",
+          "src": "assets/speakers/omer-yahud.jpg"
+        }
+      ]
+    },
+    {
+      "time": "1:40–1:45 PM",
+      "what": "5 min",
+      "speaker": "Mesut Oezdil",
+      "title": "Where Do the GPUs Go When Your Agents Run on Agent Substrate?",
+      "abstract": "AgentSubstrate puts agents to sleep when they are idle and saves their memory and files in a snapshot. GPU memory can't be saved this way, so GPU work doesn't fit into the sandbox.\nMy setup keeps the GPUs outside. kagent agents run on Substrate and send requests to a local model on Ollama. HAMi splits each GPU into slices with memory limits, so many agents can share one GPU without one agent taking all the memory.\nI'll show the setup, the numbers I got when many agents woke up at once, and what broke on the first try.",
+      "photos": [
+        {
+          "name": "Mesut Oezdil",
+          "src": "assets/speakers/mesut-oezdil.jpg"
+        }
+      ]
+    },
+    {
+      "time": "1:45–1:50 PM",
+      "what": "5 min",
+      "tbd": true
+    },
+    {
+      "time": "1:55–2:25 PM",
+      "what": "30 min",
+      "tbd": true
+    },
+    {
+      "time": "2:30–2:50 PM",
+      "what": "20 min",
+      "speaker": "Jaana Dogan, Lior Lieberman",
+      "org": "Google",
+      "title": "Agent Substrate Environment",
+      "abstract": "When we first revealed Agent Substrate, people were mind blown to see we can suspend and resume an actor at every tool call without impacting user experience. Built on top of Agent Substrate, Agent Substrate Environment is aiming to provide a higher-level abstraction designed to deliver a fast agentic environment for the entire community.\n\nAs agents evolve into autonomous problem-solvers, they require secure, stateful, and scalable environments to execute code, manipulate files, and run commands safely. While Agent Substrate supplies the sandbox runtime and orchestration primitives, we developed a higher-level abstraction that focuses on remote file system and process lifecycle operations. This new layer accelerates onboarding and provides a production grade interface for agentic systems that can use remote environments. The environment abstraction also aligns well with the model commonly used by frontier labs, acting as the operational \"hands\" that execute commands for the \"brain.\"\n\nWe will dive into how we built an agentic environment abstraction on Agent Substrate and go into details like actor lifecycle management. Additionally, we will share how this layer helped build multiple production-grade integrations at Google. Ultimately, our goal is to keep this project minimal, modular, and reusable for the broader Agent Substrate community and future ecosystem.",
+      "photos": [
+        {
+          "name": "Jaana Dogan",
+          "src": "assets/speakers/jaana-dogan.jpg"
+        },
+        {
+          "name": "Lior Lieberman",
+          "src": "assets/speakers/lior-lieberman.jpg"
+        }
+      ]
+    },
+    {
+      "time": "2:50–3:15 PM",
+      "what": "Break"
+    },
+    {
+      "time": "3:15–3:35 PM",
+      "what": "20 min",
+      "tbd": true
+    },
+    {
+      "time": "3:40–4:25 PM",
+      "what": "Panel"
+    },
+    {
+      "time": "4:25–4:35 PM",
+      "what": "Wrap up",
+      "speaker": "Tim Hockin, Eitan Yarmush, Ron Lev",
+      "org": "Google, Solo.io, NVIDIA",
+      "photos": [
+        {
+          "name": "Tim Hockin",
+          "src": "assets/speakers/tim-hockin.jpg"
+        },
+        {
+          "name": "Eitan Yarmush",
+          "src": "assets/speakers/eitan-yarmush.jpg"
+        },
+        {
+          "name": "Ron Lev",
+          "src": "assets/speakers/ron-lev.jpg"
+        }
+      ]
+    }
+  ]
+}

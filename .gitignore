@@ -1,0 +1,15 @@
+# Local pull and DNS settings. Never commit.
+.env
+.env.*
+!.env.example
+
+# Held-back portraits and name corrections. A portrait is copied into
+# assets/speakers only after that speaker is on the public schedule.
+data/private/
+
+# Credential files, in case one is copied into this folder.
+*.pem
+*credentials*.json
+gtmo_terraformer.json
+
+.DS_Store
