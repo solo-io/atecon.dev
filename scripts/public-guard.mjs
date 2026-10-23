@@ -15,15 +15,18 @@ export function redactSecrets(text) {
 	return out;
 }
 
-export function assertPublicText(text, label) {
-	if (SECRET.test(String(text || ''))) {
-		console.error(`${label} contains a source identifier or credential. It was not written.`);
-		process.exit(1);
-	}
+export function publicTextProblem(text, label) {
+	if (SECRET.test(String(text || ''))) return `${label} contains a source identifier or credential.`;
 	const emails = String(text || '').match(EMAIL) || [];
 	const bad = emails.filter((email) => !ALLOWED_EMAILS.has(email.toLowerCase()));
-	if (bad.length) {
-		console.error(`${label} contains an email address. It was not written.`);
+	if (bad.length) return `${label} contains an email address.`;
+	return '';
+}
+
+export function assertPublicText(text, label) {
+	const problem = publicTextProblem(text, label);
+	if (problem) {
+		console.error(`${problem} It was not written.`);
 		process.exit(1);
 	}
 }

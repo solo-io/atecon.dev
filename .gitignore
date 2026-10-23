@@ -6,6 +6,7 @@
 # Held-back portraits and name corrections. A portrait is copied into
 # assets/speakers only after that speaker is on the public schedule.
 data/private/
+data/private
 
 # Credential files, in case one is copied into this folder.
 *.pem
@@ -13,3 +14,4 @@ data/private/
 gtmo_terraformer.json
 
 .DS_Store
+.cursor/
