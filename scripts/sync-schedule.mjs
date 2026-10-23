@@ -1,6 +1,7 @@
-// Publish a clean sheet pull to main from a separate checkout.
+// Publish a clean sheet pull as a pull request into main.
+// main is protected, so this never pushes that branch directly.
 // The checkout you are editing is left alone.
-// Stops with no commit and no push unless every check passes.
+// Stops with no commit and no pull request unless every check passes.
 
 import { spawnSync } from 'node:child_process';
 import { existsSync, lstatSync, readFileSync, symlinkSync } from 'node:fs';
@@ -52,6 +53,38 @@ function localOnly(path) {
 	return path === '.env' || path === 'data/private' || path.startsWith('data/private/');
 }
 
+function gh(args) {
+	return spawnSync('gh', args, { cwd: publishRoot, encoding: 'utf8' });
+}
+
+function openPullRequest() {
+	const day = new Date().toISOString().slice(0, 10);
+	let branch = `schedule/${day}`;
+	let pushed = git(publishRoot, ['push', 'origin', `HEAD:refs/heads/${branch}`]);
+	if (pushed.status !== 0) {
+		branch = `schedule/${day}-${Date.now()}`;
+		pushed = git(publishRoot, ['push', 'origin', `HEAD:refs/heads/${branch}`]);
+		if (pushed.status !== 0) fail(`The schedule branch was not pushed. ${pushed.stderr || pushed.stdout || ''}`);
+	}
+	const listed = gh(['pr', 'list', '--repo', 'solo-io/atecon.dev', '--head', branch, '--base', 'main', '--state', 'open', '--json', 'url']);
+	if (listed.status !== 0) fail(listed.stderr || listed.stdout || 'Could not check for an open schedule pull request.');
+	const existing = JSON.parse(listed.stdout || '[]');
+	if (existing[0]?.url) {
+		console.log(existing[0].url);
+		return;
+	}
+	const created = gh([
+		'pr', 'create',
+		'--repo', 'solo-io/atecon.dev',
+		'--base', 'main',
+		'--head', branch,
+		'--title', 'Update the public schedule',
+		'--body', 'The sheet pull passed the public-file checks.',
+	]);
+	if (created.status !== 0) fail(created.stderr || created.stdout || 'The pull request was not opened.');
+	console.log(created.stdout.trim());
+}
+
 function restore() {
 	git(publishRoot, ['restore', '--staged', '--worktree', '--', 'data/schedule.json', 'index.html', 'llms.txt', 'assets/speakers']);
 	git(publishRoot, ['clean', '-fd', '--', 'assets/speakers']);
@@ -88,8 +121,7 @@ if (unpushed.length) {
 	if (unpushed.some((path) => !allowed(path))) {
 		fail('Refusing to publish because unpushed commits include files outside the public schedule.');
 	}
-	const pending = git(publishRoot, ['push', 'origin', 'HEAD:main']);
-	if (pending.status !== 0) fail(`The push to main did not succeed. ${pending.stderr || pending.stdout || ''}`);
+	openPullRequest();
 }
 
 gitOk(publishRoot, ['checkout', '--detach', 'origin/main']);
@@ -180,6 +212,5 @@ if (committed.status !== 0) {
 	restore();
 	fail(committed.stderr || committed.stdout || 'The commit was not created.');
 }
-const pushed = git(publishRoot, ['push', 'origin', 'HEAD:main']);
-if (pushed.status !== 0) fail(`The commit is local only. The push to main did not succeed. ${pushed.stderr || pushed.stdout || ''}`);
-console.log(`Published ${staged.length} public schedule files to main.`);
+openPullRequest();
+console.log(`Opened a pull request with ${staged.length} public schedule files.`);
