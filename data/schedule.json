@@ -130,6 +130,7 @@
       "time": "12:10–12:15 PM",
       "what": "5 min",
       "speaker": "Benjamin Elder",
+      "org": "Google",
       "title": "Evolving The Substrate Dataplane",
       "abstract": "We will cover the evolution of atelet and ateom, sandbox support, where substrate is at now and where we might go next.",
       "photos": [
