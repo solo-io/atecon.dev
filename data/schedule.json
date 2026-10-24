@@ -1,11 +1,12 @@
 {
-  "pulled_at": "2026-10-23T18:08:30.678Z",
+  "pulled_at": "2026-10-24T15:53:23.871Z",
   "rows": [
     {
       "time": "9:00–9:15 AM",
       "what": "Intro & logistics",
       "speaker": "Tim Hockin, Eitan Yarmush, Ron Lev",
       "org": "Google, Solo.io, NVIDIA",
+      "title": "Welcome to ATECon",
       "photos": [
         {
           "name": "Tim Hockin",
@@ -92,7 +93,20 @@
     {
       "time": "11:25–11:55 AM",
       "what": "30 min",
-      "tbd": true
+      "speaker": "Greg Castle, Taahir Ahmed",
+      "org": "Google",
+      "title": "Pleading the Agent: Proof of Agent identity",
+      "abstract": "If your agent is off hacking the gym booking system to get you a class appointment, you’re going to want proof that it was the agent, not you. Agent identity touches practically everything: what systems agents can talk to, what credentials agents can use, what authorized access agents have, whether/how agents can impersonate humans, and how policy applies to individuals or groups of agents. In this talk we will explain how Agent identity differs from standard human/service-account identity. What are the new opportunities and challenges? Why can’t we just use existing OAuth/X.509/whatever? We’ll cover how substrate agent identity works today and how that can be used to integrate with other systems. We’ll end with a look at the future for agent identity inside Substrate.",
+      "photos": [
+        {
+          "name": "Greg Castle",
+          "src": "assets/speakers/greg-castle.jpg"
+        },
+        {
+          "name": "Taahir Ahmed",
+          "src": "assets/speakers/taahir-ahmed.jpg"
+        }
+      ]
     },
     {
       "time": "12:00–12:05 PM",
@@ -115,7 +129,15 @@
     {
       "time": "12:10–12:15 PM",
       "what": "5 min",
-      "tbd": true
+      "speaker": "Benjamin Elder",
+      "title": "Evolving The Substrate Dataplane",
+      "abstract": "We will cover the evolution of atelet and ateom, sandbox support, where substrate is at now and where we might go next.",
+      "photos": [
+        {
+          "name": "Benjamin Elder",
+          "src": "assets/speakers/benjamin-elder.jpg"
+        }
+      ]
     },
     {
       "time": "12:15–12:20 PM",
@@ -170,7 +192,16 @@
     {
       "time": "1:30–1:35 PM",
       "what": "5 min",
-      "tbd": true
+      "speaker": "Vincent Caldeira",
+      "org": "Red Hat",
+      "title": "Instant Circuit Breakers: Sub-15ms Action Verification in Agent Substrate",
+      "abstract": "Having AI agents verify their own actions—like inspecting terminal outputs or validating API responses—by re-querying a large LLM wastes over 1.5 seconds per step. Furthermore, text-based LLM confidence statements (\"I am 90% sure this worked\") are uncalibrated and unsafe for policy enforcement. In this talk, we present an architectural pattern for real-time guardrails built directly into Agent Substrate. By combining Agent Substrate’s ephemeral Actor execution model with lightweight binary decision models (such as AnyJev or Laya) via agentgateway and agent-sandbox hooks, we evaluate binary yes/no verification conditions in a single pass under 15 ms. This provides platform teams with mathematically calibrated metrics to halt failing or unauthorized agent actions instantly, eliminating positional bias and securing agentic runtimes without generating text tokens.",
+      "photos": [
+        {
+          "name": "Vincent Caldeira",
+          "src": "assets/speakers/vincent-caldeira.jpg"
+        }
+      ]
     },
     {
       "time": "1:35–1:40 PM",
@@ -267,6 +298,7 @@
       "what": "Wrap up",
       "speaker": "Tim Hockin, Eitan Yarmush, Ron Lev",
       "org": "Google, Solo.io, NVIDIA",
+      "title": "Closing Remarks",
       "photos": [
         {
           "name": "Tim Hockin",
