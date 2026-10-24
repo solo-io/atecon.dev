@@ -2,8 +2,11 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertPublicText } from './public-guard.mjs';
+import { googleUrl, orgUrls, soloUrl } from './orgs.mjs';
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const root = process.env.LINEUP_ROOT
+	? resolve(process.env.LINEUP_ROOT)
+	: resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const scheduleText = await readFile(resolve(root, 'data/schedule.json'), 'utf8');
 assertPublicText(scheduleText, 'data/schedule.json');
 const schedule = JSON.parse(scheduleText);
@@ -14,8 +17,6 @@ const rows = Array.isArray(schedule.rows) ? schedule.rows : [];
 const discoverable = false;
 const siteUrl = 'https://atecon.dev/';
 const registerUrl = 'https://luma.com/48hh3jo5';
-const googleUrl = 'https://cloud.google.com/';
-const soloUrl = 'https://www.solo.io?utm_source=atecon&utm_medium=referrer&utm_campagin=agentsubstrateday';
 
 const aliases = {
 	time: ['time', 'start', 'start time', 'slot', 'when', 'session time'],
@@ -26,14 +27,6 @@ const aliases = {
 	abstract: ['abstract', 'description', 'details', 'subtitle', 'summary'],
 	link: ['link', 'url', 'slides', 'recording', 'session link'],
 	photo: ['photo', 'headshot', 'image', 'avatar', 'picture', 'photo url'],
-};
-
-const orgUrls = {
-	Google: googleUrl,
-	'Solo.io': soloUrl,
-	NVIDIA: 'https://www.nvidia.com/',
-	AWS: 'https://aws.amazon.com/',
-	'Cloud Foundry Foundation': 'https://www.cloudfoundry.org/',
 };
 
 function linkedOrg(value) {
@@ -159,12 +152,20 @@ function eventSchema() {
 		item.name = row.title || row.speaker || row.what || 'Session';
 		if (row.abstract) item.description = plain(row.abstract);
 		if (row.speaker) {
-			const sharedOrg = row.org && !row.org.includes(',') ? row.org : '';
-			item.performer = row.speaker.split(',').map((name) => ({
-				'@type': 'Person',
-				name: name.trim(),
-				...(sharedOrg ? { affiliation: { '@type': 'Organization', name: sharedOrg } } : {}),
-			})).filter((person) => person.name);
+			const names = row.speaker.split(',').map((name) => name.trim()).filter(Boolean);
+			const orgs = String(row.org || '').split(',').map((name) => name.trim()).filter(Boolean);
+			const photos = Array.isArray(row.photos) ? row.photos : [];
+			item.performer = names.map((name, index) => {
+				const person = { '@type': 'Person', name };
+				const photo = photos.find((item) => item.name === name) || (photos.length === 1 && names.length === 1 ? photos[0] : null);
+				if (photo?.src) person.image = `${siteUrl}${photo.src}`;
+				const org = orgs.length === names.length ? orgs[index] : (orgs.length === 1 ? orgs[0] : '');
+				if (org) {
+					person.affiliation = { '@type': 'Organization', name: org };
+					if (orgUrls[org]) person.affiliation.url = orgUrls[org];
+				}
+				return person;
+			});
 		}
 		return item;
 	});
@@ -230,7 +231,13 @@ function llmsText() {
 		}
 		const title = row.title || (row.speaker ? '' : row.what);
 		const label = [row.time, row.speaker, title].filter(Boolean).join(' — ');
-		const detail = [row.org, plain(row.abstract)].filter(Boolean).join('. ');
+		const org = String(row.org || '').split(',').map((part) => {
+			const name = part.trim();
+			if (!name) return '';
+			return orgUrls[name] ? `[${name}](${orgUrls[name]})` : name;
+		}).filter(Boolean).join(', ');
+		const portraits = (Array.isArray(row.photos) ? row.photos : []).map((photo) => `[${photo.name || 'Portrait'}](${siteUrl}${photo.src})`).join(', ');
+		const detail = [org, plain(row.abstract), portraits ? `Portraits: ${portraits}` : ''].filter(Boolean).join('. ');
 		lines.push(`- [${label}](${href})${detail ? `: ${detail}` : ''}`);
 	}
 	lines.push(
