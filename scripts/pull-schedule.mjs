@@ -13,7 +13,9 @@ import { loadLocalEnv } from './local-env.mjs';
 import { assertPublicText, redactSecrets } from './public-guard.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const root = resolve(here, '..');
+const root = process.env.LINEUP_ROOT
+	? resolve(process.env.LINEUP_ROOT)
+	: resolve(here, '..');
 const schedulePath = resolve(root, 'data/schedule.json');
 const speakersDir = resolve(root, 'assets/speakers');
 const privateDir = resolve(root, 'data/private/speakers');
@@ -272,9 +274,14 @@ for (const row of pulled) {
 	if (!time) continue;
 	const what = publicWhat(row.What);
 	if (/^transition$/i.test(String(row.What || '').trim())) continue;
-	if (isTalk(row.What) && !/^true$/i.test(String(row[acceptColumn] || '').trim())) {
-		rows.push({ time, what, tbd: true });
-		held += 1;
+	// Column I, Speaker Confirmed via Sessionize, is the only delivery switch.
+	if (!/^true$/i.test(String(row[acceptColumn] || '').trim())) {
+		if (isTalk(row.What)) {
+			rows.push({ time, what, tbd: true });
+			held += 1;
+		} else {
+			rows.push({ time, what });
+		}
 		continue;
 	}
 	const rawSpeaker = String(row['Speaker(s)'] || '').trim();

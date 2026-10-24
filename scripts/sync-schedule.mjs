@@ -68,8 +68,12 @@ function openPullRequest() {
 	}
 	const listed = gh(['pr', 'list', '--repo', 'solo-io/atecon.dev', '--head', branch, '--base', 'main', '--state', 'open', '--json', 'url']);
 	if (listed.status !== 0) fail(listed.stderr || listed.stdout || 'Could not check for an open schedule pull request.');
+	const calloutPath = resolve(root, 'data/private/lineup-callouts.md');
+	const body = existsSync(calloutPath) ? readFileSync(calloutPath, 'utf8').trim() : 'The sheet pull passed the public-file checks.';
 	const existing = JSON.parse(listed.stdout || '[]');
 	if (existing[0]?.url) {
+		const edited = gh(['pr', 'edit', existing[0].url, '--body', body]);
+		if (edited.status !== 0) fail(edited.stderr || edited.stdout || 'The pull request gaps were not updated.');
 		console.log(existing[0].url);
 		return;
 	}
@@ -79,7 +83,7 @@ function openPullRequest() {
 		'--base', 'main',
 		'--head', branch,
 		'--title', 'Update the public schedule',
-		'--body', 'The sheet pull passed the public-file checks.',
+		'--body', body,
 	]);
 	if (created.status !== 0) fail(created.stderr || created.stdout || 'The pull request was not opened.');
 	console.log(created.stdout.trim());
@@ -125,13 +129,15 @@ if (unpushed.length) {
 }
 
 gitOk(publishRoot, ['checkout', '--detach', 'origin/main']);
-const pulled = spawnSync(process.execPath, [resolve(publishRoot, 'scripts/pull-schedule.mjs')], {
+const pulled = spawnSync(process.execPath, [resolve(root, 'scripts/pull-schedule.mjs')], {
 	cwd: publishRoot,
+	env: { ...process.env, LINEUP_ROOT: publishRoot },
 	encoding: 'utf8',
 });
 if (pulled.status !== 0) fail(pulled.stderr || pulled.stdout || 'The schedule pull failed.');
-const rendered = spawnSync(process.execPath, [resolve(publishRoot, 'scripts/render.mjs')], {
+const rendered = spawnSync(process.execPath, [resolve(root, 'scripts/render.mjs')], {
 	cwd: publishRoot,
+	env: { ...process.env, LINEUP_ROOT: publishRoot },
 	encoding: 'utf8',
 });
 if (rendered.status !== 0) {
@@ -198,6 +204,17 @@ for (const path of ['data/schedule.json', 'index.html', 'llms.txt']) {
 		restore();
 		fail(problem);
 	}
+}
+
+const checked = spawnSync(process.execPath, [resolve(root, 'scripts/check-lineup.mjs')], {
+	cwd: publishRoot,
+	env: { ...process.env, LINEUP_ROOT: publishRoot },
+	encoding: 'utf8',
+});
+if (checked.stdout.trim()) console.log(checked.stdout.trim());
+if (checked.status !== 0) {
+	restore();
+	fail(checked.stderr || checked.stdout || 'The lineup check failed.');
 }
 
 gitOk(publishRoot, ['add', '--', 'data/schedule.json', 'index.html', 'llms.txt', 'assets/speakers']);
