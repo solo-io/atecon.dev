@@ -1,9 +1,26 @@
 {
-  "pulled_at": "2026-10-25T12:15:07.312Z",
+  "pulled_at": "2026-10-25T12:56:30.760Z",
   "rows": [
     {
       "time": "9:00–9:15 AM",
-      "what": "Intro & logistics"
+      "what": "Intro & logistics",
+      "speaker": "Tim Hockin, Eitan Yarmush, Ron Lev",
+      "org": "Google, Solo.io, NVIDIA",
+      "title": "Welcome to ATECon",
+      "photos": [
+        {
+          "name": "Tim Hockin",
+          "src": "assets/speakers/tim-hockin.jpg"
+        },
+        {
+          "name": "Eitan Yarmush",
+          "src": "assets/speakers/eitan-yarmush.jpg"
+        },
+        {
+          "name": "Ron Lev",
+          "src": "assets/speakers/ron-lev.jpg"
+        }
+      ]
     },
     {
       "time": "9:20–9:30 AM",
@@ -279,7 +296,24 @@
     },
     {
       "time": "4:25–4:35 PM",
-      "what": "Wrap up"
+      "what": "Wrap up",
+      "speaker": "Tim Hockin, Eitan Yarmush, Ron Lev",
+      "org": "Google, Solo.io, NVIDIA",
+      "title": "Closing Remarks",
+      "photos": [
+        {
+          "name": "Tim Hockin",
+          "src": "assets/speakers/tim-hockin.jpg"
+        },
+        {
+          "name": "Eitan Yarmush",
+          "src": "assets/speakers/eitan-yarmush.jpg"
+        },
+        {
+          "name": "Ron Lev",
+          "src": "assets/speakers/ron-lev.jpg"
+        }
+      ]
     }
   ]
 }

@@ -274,14 +274,11 @@ for (const row of pulled) {
 	if (!time) continue;
 	const what = publicWhat(row.What);
 	if (/^transition$/i.test(String(row.What || '').trim())) continue;
-	// Column I, Speaker Confirmed via Sessionize, is the only delivery switch.
-	if (!/^true$/i.test(String(row[acceptColumn] || '').trim())) {
-		if (isTalk(row.What)) {
-			rows.push({ time, what, tbd: true });
-			held += 1;
-		} else {
-			rows.push({ time, what });
-		}
+	// Column I gates talks only. Intro, wrap, breaks, lunch, and the panel stay
+	// even when that cell is blank. Their speakers still come from the sheet.
+	if (isTalk(row.What) && !/^true$/i.test(String(row[acceptColumn] || '').trim())) {
+		rows.push({ time, what, tbd: true });
+		held += 1;
 		continue;
 	}
 	const rawSpeaker = String(row['Speaker(s)'] || '').trim();
