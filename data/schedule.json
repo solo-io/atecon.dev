@@ -1,5 +1,5 @@
 {
-  "pulled_at": "2026-10-26T16:42:25.129Z",
+  "pulled_at": "2026-10-26T16:55:47.131Z",
   "rows": [
     {
       "time": "9:00–9:15 AM",
@@ -290,11 +290,6 @@
           "src": "assets/speakers/lior-lieberman.jpg"
         }
       ]
-    },
-    {
-      "time": "3:15–3:35 PM",
-      "what": "20 min",
-      "tbd": true
     },
     {
       "time": "3:40–4:25 PM",
