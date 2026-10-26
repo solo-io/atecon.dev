@@ -1,5 +1,5 @@
 {
-  "pulled_at": "2026-10-26T11:42:54.883Z",
+  "pulled_at": "2026-10-26T16:39:09.054Z",
   "rows": [
     {
       "time": "9:00–9:15 AM",
@@ -165,25 +165,11 @@
       ]
     },
     {
-      "time": "12:20–12:25 PM",
-      "what": "5 min",
-      "speaker": "Mofi Rahman",
-      "org": "Google",
-      "title": "Using Substrate for anything but Agents",
-      "abstract": "Agent Substrate is for agents. It is right there in the name. Or is it? Strip away the LLM orchestration frameworks, and what you are left with is a systems engineer's dream: an ultra-high-density, multi-tenant sandboxing platform built on Kubernetes that bypasses standard Pod lifecycle constraints.\n\nWhat happens when we hijack these primitives for workloads that have absolutely nothing to do with AI? In this talk, we will explore the limits of Substrate by utilizing its core building blocks: native process-level suspend/resume, rapid rehydration, and pod-decoupled scaling.\n\nThrough this exercise of “unconventional systems-engineering design patterns” we’ll look at the good ideas, the terrible ideas, and how pushing this infrastructure to its limits helps us all gain a better understanding of why these exact primitives make Substrate the perfect foundation for the agentic era.",
-      "photos": [
-        {
-          "name": "Mofi Rahman",
-          "src": "assets/speakers/mofi-rahman.jpg"
-        }
-      ]
-    },
-    {
-      "time": "12:25–1:25 PM",
+      "time": "12:20–1:20 PM",
       "what": "Lunch"
     },
     {
-      "time": "1:25–1:30 PM",
+      "time": "1:20–1:25 PM",
       "what": "5 min",
       "speaker": "Nick Nellis",
       "org": "Solo.io",
@@ -197,7 +183,7 @@
       ]
     },
     {
-      "time": "1:30–1:35 PM",
+      "time": "1:25–1:30 PM",
       "what": "5 min",
       "speaker": "Vincent Caldeira",
       "org": "Red Hat",
@@ -211,7 +197,7 @@
       ]
     },
     {
-      "time": "1:35–1:40 PM",
+      "time": "1:30–1:35 PM",
       "what": "5 min",
       "speaker": "Omer Yahud",
       "org": "NVIDIA",
@@ -225,7 +211,7 @@
       ]
     },
     {
-      "time": "1:40–1:45 PM",
+      "time": "1:35–1:40 PM",
       "what": "5 min",
       "speaker": "Mesut Oezdil",
       "title": "Where Do the GPUs Go When Your Agents Run on Agent Substrate?",
@@ -238,7 +224,7 @@
       ]
     },
     {
-      "time": "1:45–1:50 PM",
+      "time": "1:40–1:45 PM",
       "what": "5 min",
       "speaker": "Eliran Wolff",
       "org": "NVIDIA",
@@ -252,7 +238,7 @@
       ]
     },
     {
-      "time": "1:55–2:25 PM",
+      "time": "1:50–2:20 PM",
       "what": "30 min",
       "speaker": "Omer Yahud, Eliran Wolff",
       "org": "NVIDIA",
@@ -270,7 +256,25 @@
       ]
     },
     {
-      "time": "2:30–2:50 PM",
+      "time": "2:25–2:45 PM",
+      "what": "20 min",
+      "speaker": "Mofi Rahman",
+      "org": "Google",
+      "title": "Using Substrate for anything but Agents",
+      "abstract": "Agent Substrate is for agents. It is right there in the name. Or is it? Strip away the LLM orchestration frameworks, and what you are left with is a systems engineer's dream: an ultra-high-density, multi-tenant sandboxing platform built on Kubernetes that bypasses standard Pod lifecycle constraints.\n\nWhat happens when we hijack these primitives for workloads that have absolutely nothing to do with AI? In this talk, we will explore the limits of Substrate by utilizing its core building blocks: native process-level suspend/resume, rapid rehydration, and pod-decoupled scaling.\n\nThrough this exercise of “unconventional systems-engineering design patterns” we’ll look at the good ideas, the terrible ideas, and how pushing this infrastructure to its limits helps us all gain a better understanding of why these exact primitives make Substrate the perfect foundation for the agentic era.",
+      "photos": [
+        {
+          "name": "Mofi Rahman",
+          "src": "assets/speakers/mofi-rahman.jpg"
+        }
+      ]
+    },
+    {
+      "time": "2:45–3:15 PM",
+      "what": "Break"
+    },
+    {
+      "time": "3:15–3:35 PM",
       "what": "20 min",
       "speaker": "Jaana Dogan, Lior Lieberman",
       "org": "Google",
@@ -286,15 +290,6 @@
           "src": "assets/speakers/lior-lieberman.jpg"
         }
       ]
-    },
-    {
-      "time": "2:50–3:15 PM",
-      "what": "Break"
-    },
-    {
-      "time": "3:15–3:35 PM",
-      "what": "20 min",
-      "tbd": true
     },
     {
       "time": "3:40–4:25 PM",
@@ -320,6 +315,11 @@
           "src": "assets/speakers/ron-lev.jpg"
         }
       ]
+    },
+    {
+      "time": "3:15–3:35 PM",
+      "what": "20 min",
+      "tbd": true
     }
   ]
 }
