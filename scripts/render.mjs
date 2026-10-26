@@ -12,9 +12,8 @@ assertPublicText(scheduleText, 'data/schedule.json');
 const schedule = JSON.parse(scheduleText);
 const rows = Array.isArray(schedule.rows) ? schedule.rows : [];
 
-// The page stays out of search until the lineup is approved. Schema and llms.txt
-// are still generated so the public facts are ready to be discovered.
-const discoverable = false;
+// The lineup is approved for discovery. The page sends index, follow.
+const discoverable = true;
 const siteUrl = 'https://atecon.dev/';
 const registerUrl = 'https://luma.com/48hh3jo5';
 
@@ -204,10 +203,8 @@ function llmsText() {
 		`> The community gathering for engineers building infrastructure for AI agents on Kubernetes - brought to you by [Google](${googleUrl}), [Solo.io](${soloUrl}) and the Agent Substrate Community. Monday, November 9, 2026, 9:00am–5:00pm America/Denver, at Sky SLC in Salt Lake City.`,
 		'',
 	];
-	if (!discoverable) {
-		lines.push('The event page currently sends noindex, nofollow. This file is the public description prepared for when that changes. Talk slots marked TBD do not have an announced speaker.');
-		lines.push('');
-	}
+	lines.push('Talk slots marked TBD do not have an announced speaker.');
+	lines.push('');
 	lines.push(
 		'Hosted by the maintainers and core contributors behind Agent Substrate. One track, in one room.',
 		'',
@@ -310,14 +307,17 @@ const sessions = rows.length
 	? rows.map(sessionHtml).join('\n')
 	: '<p class="empty">Sessions, abstracts, and links will be listed here.</p>';
 const jsonLd = JSON.stringify(eventSchema()).replace(/</g, '\\u003c');
-const robots = discoverable ? '' : '  <meta name="robots" content="noindex, nofollow">\n';
+const robots = discoverable
+	? '  <meta name="robots" content="index, follow">\n'
+	: '  <meta name="robots" content="noindex, nofollow">\n';
+const canonical = `  <link rel="canonical" href="${siteUrl}">\n`;
 
 const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-${robots}  <title>Agent Substrate Day</title>
+${robots}${canonical}  <title>Agent Substrate Day</title>
   <meta name="description" content="The community gathering for engineers building infrastructure for AI agents on Kubernetes - brought to you by Google, Solo.io and the Agent Substrate Community.">
   <script type="application/ld+json">${jsonLd}</script>
   <link rel="icon" href="assets/ate-logo-with-border.svg" type="image/svg+xml">
@@ -389,6 +389,21 @@ ${robots}  <title>Agent Substrate Day</title>
 const llms = llmsText();
 assertPublicText(html, 'index.html');
 assertPublicText(llms, 'llms.txt');
+const robotsTxt = [
+	'User-agent: *',
+	'Allow: /',
+	'',
+	`Sitemap: ${siteUrl}sitemap.xml`,
+	'',
+].join('\n');
+const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>${siteUrl}</loc></url>
+  <url><loc>${siteUrl}llms.txt</loc></url>
+</urlset>
+`;
 await writeFile(resolve(root, 'index.html'), html);
 await writeFile(resolve(root, 'llms.txt'), llms);
-console.log(`Rendered index.html and llms.txt with ${rows.length} sessions`);
+await writeFile(resolve(root, 'robots.txt'), robotsTxt);
+await writeFile(resolve(root, 'sitemap.xml'), sitemap);
+console.log(`Rendered index.html, llms.txt, robots.txt, and sitemap.xml with ${rows.length} sessions`);
