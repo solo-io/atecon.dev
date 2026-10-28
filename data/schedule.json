@@ -1,5 +1,5 @@
 {
-  "pulled_at": "2026-10-26T16:55:47.131Z",
+  "pulled_at": "2026-10-28T13:11:40.285Z",
   "rows": [
     {
       "time": "9:00–9:15 AM",
@@ -130,7 +130,16 @@
     {
       "time": "12:05–12:10 PM",
       "what": "5 min",
-      "tbd": true
+      "speaker": "Anish Ramasekar",
+      "org": "Microsoft",
+      "title": "Pause Here, Resume Anywhere: Inside Substrate's Snapshot Plugin API",
+      "abstract": "Suspend an agent and its memory and disk go to object storage. Resume it and they come back, maybe on another node. Whose storage? Yours.\n\nobjectstoresnapshot/v1 is Agent Substrate's gRPC plugin API for snapshot storage. In ten minutes: where the line sits (substrate decides what moves and when a snapshot is committed; the plugin moves bytes idempotently and owns integrity), what's still open, and a live demo of an agent suspended on one node and resumed on another through a plugin the project doesn't ship.",
+      "photos": [
+        {
+          "name": "Anish Ramasekar",
+          "src": "assets/speakers/anish-ramasekar.jpg"
+        }
+      ]
     },
     {
       "time": "12:10–12:15 PM",
