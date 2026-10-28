@@ -11,4 +11,5 @@ export const orgUrls = {
 	AWS: 'https://aws.amazon.com/',
 	'Cloud Foundry Foundation': 'https://www.cloudfoundry.org/',
 	'Red Hat': 'https://www.redhat.com/',
+	Microsoft: 'https://www.microsoft.com/',
 };
