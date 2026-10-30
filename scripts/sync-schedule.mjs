@@ -46,7 +46,7 @@ function namePaths(text) {
 }
 
 function allowed(path) {
-	return allowedExact.has(path) || path.startsWith('assets/speakers/');
+	return allowedExact.has(path) || path.startsWith('assets/speakers/') || path.startsWith('assets/orgs/');
 }
 
 function localOnly(path) {
@@ -55,6 +55,12 @@ function localOnly(path) {
 
 function gh(args) {
 	return spawnSync('gh', args, { cwd: publishRoot, encoding: 'utf8' });
+}
+
+function mergePullRequest(url) {
+	const merged = gh(['pr', 'merge', url, '--merge', '--repo', 'solo-io/atecon.dev']);
+	if (merged.status !== 0) fail(merged.stderr || merged.stdout || 'The pull request was not merged.');
+	console.log(`Merged ${url}`);
 }
 
 function openPullRequest() {
@@ -71,27 +77,29 @@ function openPullRequest() {
 	const calloutPath = resolve(root, 'data/private/lineup-callouts.md');
 	const body = existsSync(calloutPath) ? readFileSync(calloutPath, 'utf8').trim() : 'The sheet pull passed the public-file checks.';
 	const existing = JSON.parse(listed.stdout || '[]');
-	if (existing[0]?.url) {
-		const edited = gh(['pr', 'edit', existing[0].url, '--body', body]);
+	let url = existing[0]?.url || '';
+	if (url) {
+		const edited = gh(['pr', 'edit', url, '--body', body]);
 		if (edited.status !== 0) fail(edited.stderr || edited.stdout || 'The pull request gaps were not updated.');
-		console.log(existing[0].url);
-		return;
+	} else {
+		const created = gh([
+			'pr', 'create',
+			'--repo', 'solo-io/atecon.dev',
+			'--base', 'main',
+			'--head', branch,
+			'--title', 'Update the public schedule',
+			'--body', body,
+		]);
+		if (created.status !== 0) fail(created.stderr || created.stdout || 'The pull request was not opened.');
+		url = created.stdout.trim();
 	}
-	const created = gh([
-		'pr', 'create',
-		'--repo', 'solo-io/atecon.dev',
-		'--base', 'main',
-		'--head', branch,
-		'--title', 'Update the public schedule',
-		'--body', body,
-	]);
-	if (created.status !== 0) fail(created.stderr || created.stdout || 'The pull request was not opened.');
-	console.log(created.stdout.trim());
+	console.log(url);
+	mergePullRequest(url);
 }
 
 function restore() {
-	git(publishRoot, ['restore', '--staged', '--worktree', '--', 'data/schedule.json', 'index.html', 'llms.txt', 'assets/speakers']);
-	git(publishRoot, ['clean', '-fd', '--', 'assets/speakers']);
+	git(publishRoot, ['restore', '--staged', '--worktree', '--', 'data/schedule.json', 'index.html', 'llms.txt', 'assets/speakers', 'assets/orgs']);
+	git(publishRoot, ['clean', '-fd', '--', 'assets/speakers', 'assets/orgs']);
 }
 
 function linkLocal(name) {
@@ -217,7 +225,7 @@ if (checked.status !== 0) {
 	fail(checked.stderr || checked.stdout || 'The lineup check failed.');
 }
 
-gitOk(publishRoot, ['add', '--', 'data/schedule.json', 'index.html', 'llms.txt', 'assets/speakers']);
+gitOk(publishRoot, ['add', '--', 'data/schedule.json', 'index.html', 'llms.txt', 'assets/speakers', 'assets/orgs']);
 const staged = namePaths(gitOk(publishRoot, ['diff', '--cached', '--name-only']));
 if (staged.some((path) => !allowed(path))) {
 	restore();
