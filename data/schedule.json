@@ -1,5 +1,5 @@
 {
-  "pulled_at": "2026-10-28T13:11:40.285Z",
+  "pulled_at": "2026-10-30T19:59:42.359Z",
   "rows": [
     {
       "time": "9:00–9:15 AM",
@@ -302,7 +302,17 @@
     },
     {
       "time": "3:40–4:25 PM",
-      "what": "Panel"
+      "what": "Panel",
+      "speaker": "Andrew Boswell, Alex Crane, Mike Bowen",
+      "org": "Swissquote, Chick-fil-A, BlackRock",
+      "title": "Agent Substrate in Production: Panel Discussion",
+      "abstract": "Panelists:\n\nAndrew Boswell, Head of IT, Swissquote\nAndrew Boswell is the Head of IT at Swissquote. During his tenure he served in front-line IT Operations, founded Site Reliability Engineering as a small team, scaled it into a division, and then took leadership of IT — applying the same first-principles engineering to private cloud, sovereign AI, and hybrid architecture. Over more than a decade at Switzerland’s leading online bank, he modernized monitoring, compute provisioning, and platform scalability and built pluridisciplinary teams around a resilience mindset.\n\nAlex Crane, Enterprise Architect, Chick-fil-A\n\nMike Bowen, BlackRock",
+      "photos": [
+        {
+          "name": "Mike Bowen",
+          "src": "assets/speakers/mike-bowen.jpg"
+        }
+      ]
     },
     {
       "time": "4:25–4:35 PM",

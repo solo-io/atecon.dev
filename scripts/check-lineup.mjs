@@ -146,29 +146,41 @@ for (const row of pulled) {
 	if (!time || /^transition$/i.test(String(row.What || '').trim())) continue;
 	const talk = isTalk(row.What);
 	const confirmed = /^true$/i.test(String(row[acceptColumn] || '').trim());
-	const pub = byTime.get(time);
-	if (!confirmed) {
-		if (pub && (pub.speaker || pub.title || pub.abstract || (pub.photos || []).length)) {
-			gaps.push(`column I did not confirm: ${time}`);
-		}
+	const title = String(row.Title || '').trim();
+	const sameTime = (schedule.rows || []).filter((item) => item.time === time);
+	const pub = sameTime.find((item) => title && item.title === title) || sameTime.find((item) => item.tbd !== true) || sameTime[0];
+	if (talk && !confirmed) {
+		const leaked = sameTime.find((item) => title && item.title === title && (item.speaker || item.abstract));
+		if (leaked) gaps.push(`column I did not confirm: ${time} ${title}`);
 		continue;
 	}
+	if (!confirmed) continue;
 	const sheetAbstract = abstractText(row.Abstract);
 	if (!sheetAbstract) {
 		if (talk) {
 			callouts.push({
 				kind: 'No abstract',
 				time,
-				speaker: pub?.speaker || '',
-				title: pub?.title || '',
+				speaker: pub?.speaker || String(row['Speaker(s)'] || '').trim(),
+				title: pub?.title || title,
 				org: pub?.org || '',
 			});
 		}
 		continue;
 	}
 	if (!pub || pub.tbd === true || pub.abstract !== sheetAbstract) {
-		gaps.push(`abstract mismatch: ${time}`);
+		gaps.push(`abstract mismatch: ${time}${title ? ` ${title}` : ''}`);
 		continue;
+	}
+	if (/^panel$/i.test(String(row.What || '').trim())) {
+		const names = String(pub?.speaker || '').split(',').map((part) => part.trim()).filter(Boolean);
+		const lines = String(row.Abstract || '').split('\n').map((line) => line.trim()).filter(Boolean);
+		for (const name of names) {
+			const hasBio = lines.some((line) => line.startsWith(name) && !line.slice(name.length).trim().startsWith(','));
+			if (!hasBio) {
+				callouts.push({ kind: 'No bio', time, speaker: name, title: pub?.title || title, org: '' });
+			}
+		}
 	}
 	const text = plain(sheetAbstract);
 	const described = subEvents.some((item) => plain(item.description) === text);
@@ -193,7 +205,8 @@ for (const row of schedule.rows || []) {
 	for (const name of names) {
 		const file = portraits.get(slug(name));
 		if (!file) {
-			callouts.push({ kind: 'No portrait', time: row.time, speaker: name, title: row.title || '', org: row.org || '' });
+			const org = orgs.length === names.length ? orgs[names.indexOf(name)] : (orgs.length === 1 ? orgs[0] : '');
+			callouts.push({ kind: 'No portrait', time: row.time, speaker: name, title: row.title || '', org });
 			continue;
 		}
 		const bytes = readFileSync(resolve(speakerDir, file));
@@ -224,7 +237,7 @@ function calloutLine(item) {
 }
 
 const unique = (items) => [...new Set(items)];
-const kinds = ['No portrait', 'No abstract', 'No company'];
+const kinds = ['No portrait', 'No abstract', 'No company', 'No bio'];
 const sections = kinds.map((kind) => {
 	const lines = callouts.filter((item) => item.kind === kind).map(calloutLine);
 	return { kind, lines: unique(lines) };

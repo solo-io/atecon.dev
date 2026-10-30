@@ -2,7 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assertPublicText } from './public-guard.mjs';
-import { googleUrl, orgUrls, soloUrl } from './orgs.mjs';
+import { googleUrl, orgLogos, orgUrls, soloUrl } from './orgs.mjs';
 
 const root = process.env.LINEUP_ROOT
 	? resolve(process.env.LINEUP_ROOT)
@@ -89,6 +89,53 @@ function publicFormat(what) {
 	if (/^extended talk\b/.test(key)) return '30 min';
 	if (/^wrap up\b/.test(key)) return 'Wrap up';
 	return String(what || '').trim();
+}
+
+function initials(name) {
+	return String(name || '').split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0].toUpperCase()).join('');
+}
+
+function bioFor(abstract, name, names) {
+	const lines = String(abstract || '').replace(/\r\n/g, '\n').split('\n').map((line) => line.trim()).filter(Boolean);
+	const chunks = [];
+	let on = false;
+	for (const line of lines) {
+		const owner = names.find((person) => line.toLowerCase().startsWith(person.toLowerCase()));
+		if (owner) {
+			const rest = line.slice(owner.length).trim();
+			on = owner === name && !rest.startsWith(',');
+			if (on) chunks.push(line);
+			continue;
+		}
+		if (on) chunks.push(line);
+	}
+	return chunks.join('\n');
+}
+
+function panelistCards(row) {
+	if (!/^panel$/i.test(String(row.what || '').trim())) return '';
+	const names = String(row.speaker || '').split(',').map((part) => part.trim()).filter(Boolean);
+	if (names.length < 2) return '';
+	const orgs = String(row.org || '').split(',').map((part) => part.trim()).filter(Boolean);
+	const photos = portraitList(row, '', row.speaker);
+	return names.map((name, index) => {
+		const org = orgs.length === names.length ? orgs[index] : (orgs.length === 1 ? orgs[0] : '');
+		const photo = photos.find((item) => item.name === name) || null;
+		const bio = bioFor(row.abstract, name, names);
+		const face = photo
+			? `<img class="portrait" src="${esc(photo.src)}" alt="${esc(name)}">`
+			: `<span class="portrait placeholder" aria-hidden="true">${esc(initials(name))}</span>`;
+		const logoSrc = orgLogos[org];
+		const logo = logoSrc && logoSrc.startsWith('assets/orgs/') && !logoSrc.includes('..') && orgUrls[org]
+			? `<a class="org-mark-link" href="${esc(orgUrls[org])}"><img class="org-mark" src="${esc(logoSrc)}" alt="${esc(org)}"></a>`
+			: '';
+		const company = logo || (org ? linkedOrg(org) : '');
+		const mark = bio ? `<span class="panelist-more" aria-hidden="true"></span>` : '';
+		const summary = `<span class="panelist-face">${face}${mark}</span><span class="panelist-id"><span class="panelist-name">${esc(name)}</span>${company}</span>`;
+		if (!bio) return `<div class="panelist">${summary}</div>`;
+		const body = bio.split(/\n\s*\n/).map((part) => `<p>${esc(part).replace(/\n/g, '<br>')}</p>`).join('');
+		return `<details class="panelist"><summary>${summary}</summary>${body}</details>`;
+	}).join('');
 }
 
 function abstractHtml(text) {
@@ -277,8 +324,9 @@ function sessionHtml(row, index) {
 	const marker = /^(break|lunch|transition)$/i.test(what) || (!speaker && !talk);
 	const format = publicFormat(what);
 	const heading = speaker || talk || what || 'Session';
+	const cards = panelistCards(row);
 	const photos = portraitList(row, photo, speaker);
-	const photoHtml = photos.length
+	const photoHtml = !cards && photos.length
 		? `<div class="portraits">${photos.map((item) => `<img class="portrait" src="${esc(item.src)}" alt="${esc(item.name)}">`).join('')}</div>`
 		: '';
 	const extraHtml = extras.map(([key, value]) => {
@@ -290,13 +338,13 @@ function sessionHtml(row, index) {
         ${time ? `<p class="when">${esc(time)}</p>` : '<p class="when"></p>'}
         <div class="session-copy">
           ${format && format !== heading ? `<p class="format">${esc(format)}</p>` : ''}
-          <div class="session-head">
+          ${cards ? `<div class="panelists">${cards}</div>` : `<div class="session-head">
             ${photoHtml}
             <h3>${esc(heading)}</h3>
-          </div>
-          ${roleLine ? `<p class="role">${roleLine}</p>` : ''}
-          ${talk && talk !== heading ? `<p class="talk">${esc(talk)}</p>` : ''}
-          ${abstractHtml(abstract)}
+          </div>`}
+          ${cards || !roleLine ? '' : `<p class="role">${roleLine}</p>`}
+          ${talk && talk !== heading ? (cards ? `<h3 class="talk">${esc(talk)}</h3>` : `<p class="talk">${esc(talk)}</p>`) : ''}
+          ${cards ? '' : abstractHtml(abstract)}
           ${link ? `<p class="session-link"><a href="${esc(link)}">Session link</a></p>` : ''}
           ${extraHtml}
         </div>
@@ -324,7 +372,7 @@ ${robots}${canonical}  <title>Agent Substrate Day</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="styles.css?v=14">
   <script>
     window.HIVEMIND_ATTRIBUTION = {
       propertyKey: 'pk_5dc4bcfa84b8c0fb6e3875770fa7c385',

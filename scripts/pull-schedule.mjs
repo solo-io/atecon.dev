@@ -64,6 +64,28 @@ function companyName(value) {
 	return text;
 }
 
+const privateColumns = new Set([
+	'Speaker Social Cards Sent',
+	'Sessionize',
+	'ID',
+	'Scheduled in Sessionize',
+]);
+
+function isPanel(what) {
+	return /^panel$/i.test(String(what || '').trim());
+}
+
+function panelPeople(value) {
+	return String(value || '').split(/\n/).map((line) => line.trim()).filter(Boolean).map((line) => {
+		const comma = line.indexOf(',');
+		if (comma < 0) return { name: line, company: '' };
+		return {
+			name: line.slice(0, comma).trim(),
+			company: companyName(line.slice(comma + 1)),
+		};
+	}).filter((person) => person.name);
+}
+
 function speakerName(value, editorial) {
 	const text = String(value || '').trim();
 	if (!text) return '';
@@ -267,6 +289,13 @@ function isTalk(what) {
 	return /^(lightning|short talk|standard talk|extended talk)\b/i.test(what);
 }
 
+const confirmedTalkTimes = new Set();
+for (const row of pulled) {
+	const time = clockRange(row.Start, row.End);
+	if (!time || !isTalk(row.What)) continue;
+	if (/^true$/i.test(String(row[acceptColumn] || '').trim())) confirmedTalkTimes.add(time);
+}
+
 const rows = [];
 let held = 0;
 for (const row of pulled) {
@@ -276,14 +305,26 @@ for (const row of pulled) {
 	if (/^transition$/i.test(String(row.What || '').trim())) continue;
 	// Column I gates talks only. Intro, wrap, breaks, lunch, and the panel stay
 	// even when that cell is blank. Their speakers still come from the sheet.
+	// A FALSE talk loses the slot when another talk at the same time is TRUE.
 	if (isTalk(row.What) && !/^true$/i.test(String(row[acceptColumn] || '').trim())) {
+		if (confirmedTalkTimes.has(time)) continue;
 		rows.push({ time, what, tbd: true });
 		held += 1;
 		continue;
 	}
 	const rawSpeaker = String(row['Speaker(s)'] || '').trim();
-	const speaker = speakerName(rawSpeaker, editorial);
-	const org = orgFor(rawSpeaker, companiesFrom(pulled), editorial) || orgFor(speaker, companiesFrom(pulled), editorial);
+	let speaker = speakerName(rawSpeaker, editorial);
+	let org = orgFor(rawSpeaker, companiesFrom(pulled), editorial) || orgFor(speaker, companiesFrom(pulled), editorial);
+	if (isPanel(row.What) && rawSpeaker.includes('\n')) {
+		const people = panelPeople(rawSpeaker);
+		speaker = people.map((person) => speakerName(person.name, editorial)).join(', ');
+		const orgs = [];
+		for (const person of people) {
+			const company = person.company || orgFor(person.name, companiesFrom(pulled), editorial);
+			if (company && !orgs.includes(company)) orgs.push(company);
+		}
+		org = orgs.join(', ');
+	}
 	const title = String(row.Title || '').trim();
 	const abstract = abstractText(row.Abstract);
 	const next = { time, what };
@@ -291,10 +332,25 @@ for (const row of pulled) {
 	if (org) next.org = org;
 	if (title) next.title = title;
 	if (abstract) next.abstract = abstract;
+	for (const key of privateColumns) delete next[key];
 	const photos = await photosFor(speaker);
 	if (photos.length) next.photos = photos;
 	rows.push(next);
 }
+
+function startMinutes(time) {
+	const text = String(time || '');
+	const clock = text.match(/^(\d{1,2}):(\d{2})/);
+	const half = text.match(/\b(AM|PM)\b/i);
+	if (!clock || !half) return 0;
+	let hour = Number(clock[1]);
+	const minute = Number(clock[2]);
+	const meridiem = half[1].toUpperCase();
+	if (meridiem === 'PM' && hour !== 12) hour += 12;
+	if (meridiem === 'AM' && hour === 12) hour = 0;
+	return hour * 60 + minute;
+}
+rows.sort((a, b) => startMinutes(a.time) - startMinutes(b.time));
 
 if (rows.length < 10) {
 	fail(`Refusing to overwrite the public schedule. The sheet produced ${rows.length} public sessions.`);

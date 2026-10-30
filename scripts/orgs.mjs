@@ -12,4 +12,13 @@ export const orgUrls = {
 	'Cloud Foundry Foundation': 'https://www.cloudfoundry.org/',
 	'Red Hat': 'https://www.redhat.com/',
 	Microsoft: 'https://www.microsoft.com/',
+	Swissquote: 'https://www.swissquote.com/',
+	'Chick-fil-A': 'https://www.chick-fil-a.com/',
+	BlackRock: 'https://www.blackrock.com/',
+};
+
+export const orgLogos = {
+	Swissquote: 'assets/orgs/swissquote.svg',
+	'Chick-fil-A': 'assets/orgs/chick-fil-a.svg',
+	BlackRock: 'assets/orgs/blackrock.svg',
 };
