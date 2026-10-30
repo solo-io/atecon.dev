@@ -146,28 +146,30 @@ for (const row of pulled) {
 	if (!time || /^transition$/i.test(String(row.What || '').trim())) continue;
 	const talk = isTalk(row.What);
 	const confirmed = /^true$/i.test(String(row[acceptColumn] || '').trim());
-	const pub = byTime.get(time);
-	if (!confirmed) {
-		if (pub && (pub.speaker || pub.title || pub.abstract || (pub.photos || []).length)) {
-			gaps.push(`column I did not confirm: ${time}`);
-		}
+	const title = String(row.Title || '').trim();
+	const sameTime = (schedule.rows || []).filter((item) => item.time === time);
+	const pub = sameTime.find((item) => title && item.title === title) || sameTime.find((item) => item.tbd !== true) || sameTime[0];
+	if (talk && !confirmed) {
+		const leaked = sameTime.find((item) => title && item.title === title && (item.speaker || item.abstract));
+		if (leaked) gaps.push(`column I did not confirm: ${time} ${title}`);
 		continue;
 	}
+	if (!confirmed) continue;
 	const sheetAbstract = abstractText(row.Abstract);
 	if (!sheetAbstract) {
 		if (talk) {
 			callouts.push({
 				kind: 'No abstract',
 				time,
-				speaker: pub?.speaker || '',
-				title: pub?.title || '',
+				speaker: pub?.speaker || String(row['Speaker(s)'] || '').trim(),
+				title: pub?.title || title,
 				org: pub?.org || '',
 			});
 		}
 		continue;
 	}
 	if (!pub || pub.tbd === true || pub.abstract !== sheetAbstract) {
-		gaps.push(`abstract mismatch: ${time}`);
+		gaps.push(`abstract mismatch: ${time}${title ? ` ${title}` : ''}`);
 		continue;
 	}
 	const text = plain(sheetAbstract);
