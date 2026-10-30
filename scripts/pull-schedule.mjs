@@ -64,6 +64,28 @@ function companyName(value) {
 	return text;
 }
 
+const privateColumns = new Set([
+	'Speaker Social Cards Sent',
+	'Sessionize',
+	'ID',
+	'Scheduled in Sessionize',
+]);
+
+function isPanel(what) {
+	return /^panel$/i.test(String(what || '').trim());
+}
+
+function panelPeople(value) {
+	return String(value || '').split(/\n/).map((line) => line.trim()).filter(Boolean).map((line) => {
+		const comma = line.indexOf(',');
+		if (comma < 0) return { name: line, company: '' };
+		return {
+			name: line.slice(0, comma).trim(),
+			company: companyName(line.slice(comma + 1)),
+		};
+	}).filter((person) => person.name);
+}
+
 function speakerName(value, editorial) {
 	const text = String(value || '').trim();
 	if (!text) return '';
@@ -291,8 +313,18 @@ for (const row of pulled) {
 		continue;
 	}
 	const rawSpeaker = String(row['Speaker(s)'] || '').trim();
-	const speaker = speakerName(rawSpeaker, editorial);
-	const org = orgFor(rawSpeaker, companiesFrom(pulled), editorial) || orgFor(speaker, companiesFrom(pulled), editorial);
+	let speaker = speakerName(rawSpeaker, editorial);
+	let org = orgFor(rawSpeaker, companiesFrom(pulled), editorial) || orgFor(speaker, companiesFrom(pulled), editorial);
+	if (isPanel(row.What) && rawSpeaker.includes('\n')) {
+		const people = panelPeople(rawSpeaker);
+		speaker = people.map((person) => speakerName(person.name, editorial)).join(', ');
+		const orgs = [];
+		for (const person of people) {
+			const company = person.company || orgFor(person.name, companiesFrom(pulled), editorial);
+			if (company && !orgs.includes(company)) orgs.push(company);
+		}
+		org = orgs.join(', ');
+	}
 	const title = String(row.Title || '').trim();
 	const abstract = abstractText(row.Abstract);
 	const next = { time, what };
@@ -300,6 +332,7 @@ for (const row of pulled) {
 	if (org) next.org = org;
 	if (title) next.title = title;
 	if (abstract) next.abstract = abstract;
+	for (const key of privateColumns) delete next[key];
 	const photos = await photosFor(speaker);
 	if (photos.length) next.photos = photos;
 	rows.push(next);

@@ -263,6 +263,146 @@ h2 {
   background: #141416;
 }
 
+.panelists {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.9rem;
+  margin: 0.15rem 0 0.9rem;
+}
+
+.panelist {
+  max-width: 36rem;
+  interpolate-size: allow-keywords;
+}
+
+.panelist > summary,
+.panelist:not(details) {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 0.75rem;
+  align-items: center;
+}
+
+.panelist summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.panelist summary::-webkit-details-marker { display: none; }
+
+.panelist-face {
+  position: relative;
+  width: 52px;
+  height: 52px;
+}
+
+.panelist .portrait {
+  width: 52px;
+  height: 52px;
+}
+
+.portrait.placeholder {
+  display: grid;
+  place-items: center;
+  color: var(--lime);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.panelist-more {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  width: 0.95rem;
+  height: 0.95rem;
+  border-radius: 50%;
+  background: var(--lime);
+}
+
+.panelist-more::after {
+  content: "";
+  position: absolute;
+  left: 0.28rem;
+  top: 0.22rem;
+  width: 0.28rem;
+  height: 0.28rem;
+  border-right: 2px solid #111;
+  border-bottom: 2px solid #111;
+  transform: rotate(45deg);
+  transition: transform 0.32s ease;
+}
+
+.panelist[open] .panelist-more::after {
+  top: 0.32rem;
+  transform: rotate(225deg);
+}
+
+.panelist[open] .panelist-name { color: var(--lime); }
+
+.panelist-id {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  min-width: 0;
+}
+
+.panelist-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.panelist-org {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.org-mark-link {
+  display: inline-flex;
+  width: fit-content;
+  line-height: 0;
+}
+
+.org-mark {
+  height: 32px;
+  width: auto;
+  max-width: 9.5rem;
+  object-fit: contain;
+  object-position: left center;
+  background: #f6f3ec;
+  border-radius: 4px;
+  padding: 4px 6px;
+}
+
+.org-mark[alt="Chick-fil-A"] {
+  height: 54px;
+  max-width: 8.2rem;
+}
+
+.panelist::details-content {
+  height: 0;
+  overflow: clip;
+  opacity: 0;
+  transition: height 0.32s ease, opacity 0.32s ease, content-visibility 0.32s allow-discrete;
+}
+
+.panelist[open]::details-content {
+  height: auto;
+  opacity: 1;
+}
+
+.panelist p {
+  margin: 0.55rem 0 0;
+  color: var(--text);
+  font-size: 0.98rem;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
 .session-copy h3 {
   margin: 0;
   min-width: 0;
@@ -281,6 +421,10 @@ h2 {
   border-left: 3px solid var(--lime);
   font-size: 1.2rem;
   font-weight: 700;
+}
+
+.session-copy h3.talk {
+  font-size: 1.2rem;
 }
 
 .abstract {
@@ -432,7 +576,9 @@ h2 {
   .cream p,
   .place::before { animation: none; }
   .abstract summary::after,
-  .abstract::details-content { transition: none; }
+  .abstract::details-content,
+  .panelist-more::after,
+  .panelist::details-content { transition: none; }
 }
 
 .place h2 { color: var(--text); }
