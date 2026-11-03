@@ -1,5 +1,5 @@
 {
-  "pulled_at": "2026-10-30T19:59:42.359Z",
+  "pulled_at": "2026-11-03T13:15:02.930Z",
   "rows": [
     {
       "time": "9:00–9:15 AM",
@@ -306,7 +306,7 @@
       "speaker": "Andrew Boswell, Alex Crane, Mike Bowen",
       "org": "Swissquote, Chick-fil-A, BlackRock",
       "title": "Agent Substrate in Production: Panel Discussion",
-      "abstract": "Panelists:\n\nAndrew Boswell, Head of IT, Swissquote\nAndrew Boswell is the Head of IT at Swissquote. During his tenure he served in front-line IT Operations, founded Site Reliability Engineering as a small team, scaled it into a division, and then took leadership of IT — applying the same first-principles engineering to private cloud, sovereign AI, and hybrid architecture. Over more than a decade at Switzerland’s leading online bank, he modernized monitoring, compute provisioning, and platform scalability and built pluridisciplinary teams around a resilience mindset.\n\nAlex Crane, Enterprise Architect, Chick-fil-A\n\nMike Bowen, BlackRock",
+      "abstract": "Panelists:\n\nAndrew Boswell, Head of IT, Swissquote\nAndrew Boswell is the Head of IT at Swissquote. During his tenure he served in front-line IT Operations, founded Site Reliability Engineering as a small team, scaled it into a division, and then took leadership of IT — applying the same first-principles engineering to private cloud, sovereign AI, and hybrid architecture. Over more than a decade at Switzerland’s leading online bank, he modernized monitoring, compute provisioning, and platform scalability and built pluridisciplinary teams around a resilience mindset.\n\nAlex Crane, Enterprise Architect, Chick-fil-A\nAlex Crane is an Enterprise Architect at Chick-fil-A, where he identifies strategic technology opportunities, builds platforms around them, and stewards those platforms to maturity. He helped build Chick-fil-A’s Kubernetes-at-the-edge platform, which runs clusters in restaurants across the chain and is managed with GitOps at scale. Today Alex owns the company’s Google Cloud and sandbox platforms and helps lead enterprise AI governance, including guardrails for MCP integrations and secure runtime isolation for AI agents. He has spoken about edge computing, platform engineering, and how to adopt new technology quickly without compromising security.\n\nMike Bowen, BlackRock",
       "photos": [
         {
           "name": "Mike Bowen",
